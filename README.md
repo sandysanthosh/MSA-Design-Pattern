@@ -97,3 +97,297 @@ Spring Boot leverages various design patterns to provide a robust and scalable f
    ```
 
 By understanding and applying these design patterns, you can leverage Spring Boot’s capabilities to build robust, maintainable, and scalable applications.
+
+
+Sure! Here are examples of each design pattern applied in Spring Boot:
+
+### 1. Singleton Pattern
+
+In Spring Boot, all beans are singletons by default unless specified otherwise.
+
+```java
+import org.springframework.stereotype.Service;
+
+@Service
+public class SingletonService {
+    // Singleton service bean
+}
+```
+
+### 2. Factory Pattern
+
+Using `FactoryBean` to create beans:
+
+```java
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyFactoryBean implements FactoryBean<MyService> {
+
+    @Override
+    public MyService getObject() throws Exception {
+        return new MyServiceImpl();
+    }
+
+    @Override
+    public Class<?> getObjectType() {
+        return MyService.class;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
+}
+```
+
+### 3. Proxy Pattern
+
+Using Spring AOP to create a proxy for logging:
+
+```java
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before("execution(* com.example.service.*.*(..))")
+    public void logBefore(JoinPoint joinPoint) {
+        System.out.println("Method called: " + joinPoint.getSignature().getName());
+    }
+}
+```
+
+### 4. Template Method Pattern
+
+Using `JdbcTemplate` for database operations:
+
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class UserRepository {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    public List<User> findAll() {
+        String sql = "SELECT * FROM users";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new User(rs.getString("name")));
+    }
+}
+```
+
+### 5. Dependency Injection Pattern
+
+Injecting a repository into a service:
+
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+}
+```
+
+### 6. MVC Pattern
+
+Defining a controller, service, and repository in Spring MVC:
+
+```java
+// Controller
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("/users")
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
+}
+
+// Service
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+}
+
+// Repository
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+}
+```
+
+### 7. Observer Pattern
+
+Creating an event and a listener:
+
+```java
+// Event
+import org.springframework.context.ApplicationEvent;
+
+public class UserCreatedEvent extends ApplicationEvent {
+    private final User user;
+
+    public UserCreatedEvent(Object source, User user) {
+        super(source);
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
+    }
+}
+
+// Listener
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class UserCreatedListener {
+
+    @EventListener
+    public void handleUserCreatedEvent(UserCreatedEvent event) {
+        System.out.println("User created: " + event.getUser().getName());
+    }
+}
+
+// Publishing the event
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    public void createUser(User user) {
+        userRepository.save(user);
+        eventPublisher.publishEvent(new UserCreatedEvent(this, user));
+    }
+}
+```
+
+### 8. Decorator Pattern
+
+Creating a decorator for a service:
+
+```java
+// Service Interface
+public interface UserService {
+    User getUserById(Long id);
+}
+
+// Service Implementation
+@Service
+public class UserServiceImpl implements UserService {
+
+    @Override
+    public User getUserById(Long id) {
+        // Fetch user from database
+        return new User(id, "John Doe");
+    }
+}
+
+// Decorator
+@Service
+public class UserServiceDecorator implements UserService {
+
+    @Autowired
+    private UserServiceImpl userService;
+
+    @Override
+    public User getUserById(Long id) {
+        User user = userService.getUserById(id);
+        // Add additional behavior
+        System.out.println("User fetched: " + user.getName());
+        return user;
+    }
+}
+```
+
+### 9. Builder Pattern
+
+Building a `RestTemplate` with custom settings:
+
+```java
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder
+                .setConnectTimeout(Duration.ofMillis(5000))
+                .setReadTimeout(Duration.ofMillis(5000))
+                .build();
+    }
+}
+```
+
+### 10. Strategy Pattern
+
+Using different `TaskExecutor` implementations:
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+@Configuration
+public class TaskExecutorConfig {
+
+    @Bean
+    public TaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(25);
+        executor.initialize();
+        return executor;
+    }
+}
+```
+
+These examples illustrate how various design patterns are applied in Spring Boot to create a well-structured and maintainable codebase.
