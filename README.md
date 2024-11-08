@@ -1,44 +1,56 @@
-Spring Boot leverages various design patterns to provide a robust and scalable framework for developing Java applications. Here are some of the key design patterns used in Spring Boot:
+In **Spring Boot API development**, certain design patterns are commonly used to build robust, maintainable, and scalable applications. Here are some of the most frequently used patterns:
 
-1. **Singleton Pattern**:
+### 1. **Singleton Pattern**
    - **Usage**: Ensures a class has only one instance and provides a global point of access to it.
-   - **Spring Example**: Spring beans are by default singletons, managed by the Spring container.
+   - **Spring Boot**: This is one of the most used patterns in Spring. By default, Spring beans are singleton-scoped, meaning that Spring creates a single instance of a bean and shares it across the entire application.
+   - **Example**: Services, repositories, and controllers in Spring Boot are usually singletons.
 
-2. **Factory Pattern**:
-   - **Usage**: Creates objects without specifying the exact class of the object that will be created.
-   - **Spring Example**: The `FactoryBean` interface in Spring provides a way to create objects through a factory.
+### 2. **Factory Pattern**
+   - **Usage**: Provides an interface for creating instances, with subclasses determining the specific object types created.
+   - **Spring Boot**: The `@Bean` annotation in Spring acts like a factory, defining objects created and managed by the Spring IoC container.
+   - **Example**: Bean creation methods within `@Configuration` classes use a factory approach to instantiate and configure dependencies.
 
-3. **Proxy Pattern**:
-   - **Usage**: Provides a surrogate or placeholder for another object to control access to it.
-   - **Spring Example**: Used extensively in AOP (Aspect-Oriented Programming) to create proxies for objects to implement cross-cutting concerns like logging, transaction management, etc.
+### 3. **Prototype Pattern**
+   - **Usage**: Creates a new instance each time it is needed, instead of reusing a single instance.
+   - **Spring Boot**: This pattern is available through the prototype scope. Setting a bean's scope to `@Scope("prototype")` tells Spring to create a new instance every time it is requested.
+   - **Example**: Useful for non-thread-safe components or objects that require new data each time.
 
-4. **Template Method Pattern**:
-   - **Usage**: Defines the skeleton of an algorithm in a method, deferring some steps to subclasses.
-   - **Spring Example**: The `JdbcTemplate` and `RestTemplate` classes provide templates for database and REST operations, respectively.
+### 4. **Template Method Pattern**
+   - **Usage**: Defines the skeleton of an algorithm, allowing subclasses to fill in specific steps.
+   - **Spring Boot**: Used in Spring’s `JdbcTemplate`, `RestTemplate`, and `JpaRepository` classes. These classes provide abstract methods for database or HTTP operations, leaving specific implementations to subclasses.
+   - **Example**: `JdbcTemplate` provides general database interaction methods, letting you define specific SQL queries.
 
-5. **Dependency Injection Pattern**:
-   - **Usage**: Allows a class to be independent of its dependencies, which are provided by an external source rather than the class itself.
-   - **Spring Example**: Core to Spring, where the container manages the lifecycle and dependencies of beans.
+### 5. **Proxy Pattern**
+   - **Usage**: Provides a placeholder or surrogate for another object to control access or add additional functionality.
+   - **Spring Boot**: AOP (Aspect-Oriented Programming) uses proxies in Spring Boot. Spring’s `@Transactional` annotation uses proxies to wrap methods in transaction logic, ensuring automatic commit or rollback.
+   - **Example**: Transaction management, security, and caching.
 
-6. **MVC (Model-View-Controller) Pattern**:
-   - **Usage**: Separates an application into three main components: Model (data), View (UI), and Controller (business logic).
-   - **Spring Example**: Spring MVC framework implements this pattern to build web applications.
+### 6. **Decorator Pattern**
+   - **Usage**: Allows behavior to be added to an object dynamically without altering its structure.
+   - **Spring Boot**: Commonly used in Spring Boot’s web filters and interceptors, which add behavior (like logging or authentication) to HTTP requests and responses.
+   - **Example**: Customizing `HandlerInterceptor` for request logging or `Filter` for adding security checks.
 
-7. **Observer Pattern**:
-   - **Usage**: Defines a one-to-many dependency between objects so that when one object changes state, all its dependents are notified and updated automatically.
-   - **Spring Example**: Spring’s event-driven architecture, where beans can listen for and react to events.
+### 7. **Observer Pattern**
+   - **Usage**: Defines a one-to-many dependency between objects so that when one object changes state, all dependents are notified.
+   - **Spring Boot**: Used in Spring's event-driven architecture, where you can define events and listeners with `@EventListener`.
+   - **Example**: Application events like `ApplicationReadyEvent`, `ContextRefreshedEvent`, or custom events to communicate across different parts of the application.
 
-8. **Decorator Pattern**:
-   - **Usage**: Adds behavior to objects dynamically by wrapping them in an object of a decorator class.
-   - **Spring Example**: Used in Spring AOP to add additional behavior to methods.
+### 8. **Builder Pattern**
+   - **Usage**: Provides a flexible solution for creating complex objects step-by-step.
+   - **Spring Boot**: Often used in constructing complex objects such as HTTP requests, responses, or configuration settings.
+   - **Example**: `UriComponentsBuilder` for creating URIs in a flexible way; `ResponseEntity` builder for constructing HTTP responses.
 
-9. **Builder Pattern**:
-   - **Usage**: Separates the construction of a complex object from its representation.
-   - **Spring Example**: Often used in the configuration of beans and constructing complex objects like `RestTemplate` or `WebClient` instances.
+### 9. **MVC (Model-View-Controller) Pattern**
+   - **Usage**: Separates an application into three main components: Model, View, and Controller.
+   - **Spring Boot**: A foundational pattern for Spring’s `@Controller` classes that handle HTTP requests, where models are used to carry data, controllers handle requests, and views render HTML (or JSON/XML for APIs).
+   - **Example**: All Spring Boot web applications and REST APIs are structured around this pattern.
 
-10. **Strategy Pattern**:
-    - **Usage**: Defines a family of algorithms, encapsulates each one, and makes them interchangeable.
-    - **Spring Example**: The `TaskExecutor` and `DataSource` interfaces allow for different implementations to be plugged in.
+### 10. **Command Pattern**
+   - **Usage**: Encapsulates a request as an object, allowing for parameterization of clients with queues, requests, and operations.
+   - **Spring Boot**: Often used in conjunction with messaging (RabbitMQ, Kafka) and task scheduling.
+   - **Example**: In service-oriented architectures where actions or commands need to be queued or scheduled.
+
+These design patterns work well with Spring Boot’s features and are common in modern application development, ensuring cleaner code, better separation of concerns, and easier maintainability.
 
 ### Practical Examples in Spring Boot
 
